@@ -118,7 +118,7 @@ function calculateFilteredSummary(agents: AgentActivityData[]): AgentSummary | n
   };
 }
 
-export default function AITeammateDashboard() {
+export default function AIAgentsDashboard() {
   const [dateRange, setDateRange] = useState<DateRange>({
     from: startOfDay(subDays(new Date(), 90)),
     to: endOfDay(new Date()),
@@ -142,9 +142,6 @@ export default function AITeammateDashboard() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (<Skeleton key={i} className="h-32" />))}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          {[1, 2, 3, 4, 5].map((i) => (<Skeleton key={i} className="h-64" />))}
         </div>
       </div>
     );
@@ -189,7 +186,7 @@ export default function AITeammateDashboard() {
         <Card className="p-12 text-center">
           <Bot className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold text-foreground mb-2">No AI Teammate Activity Found</h3>
-          <p className="text-muted-foreground max-w-md mx-auto">Your AI Teammates don't have any assigned tickets yet. Activity will appear here once they start working on tickets.</p>
+          <p className="text-muted-foreground max-w-md mx-auto">Your AI Teammates don't have any assigned tickets yet.</p>
         </Card>
       )}
 
