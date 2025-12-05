@@ -15,6 +15,7 @@ const SFDCBoard = lazy(() => import("./pages/SFDCBoard"));
 const DepartmentView = lazy(() => import("./pages/DepartmentView"));
 const BlockersView = lazy(() => import("./pages/BlockersView"));
 const AITeammateDashboard = lazy(() => import("./pages/AITeammateDashboard"));
+const AgentProfilePage = lazy(() => import("./pages/AgentProfilePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading fallback component
@@ -54,6 +55,7 @@ const App = () => (
                   <Route path="/departments" element={<DepartmentView />} />
                   <Route path="/blockers" element={<BlockersView />} />
                   <Route path="/ai-teammates" element={<AITeammateDashboard />} />
+                  <Route path="/ai-teammates/:agentId" element={<AgentProfilePage />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
