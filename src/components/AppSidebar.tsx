@@ -1,4 +1,4 @@
-import { Home, Server, Database, Building2, AlertCircle } from "lucide-react";
+import { Home, Server, Database, Building2, AlertCircle, Bot } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -39,6 +39,11 @@ const items = [
     title: "Information Needed",
     url: "/blockers",
     icon: AlertCircle,
+  },
+  {
+    title: "AI Teammates",
+    url: "/ai-teammates",
+    icon: Bot,
   },
 ];
 
