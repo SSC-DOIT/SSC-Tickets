@@ -1,4 +1,11 @@
-import { Bot, RefreshCw, Clock, CheckCircle2, Zap, TrendingUp } from "lucide-react";
+import {
+  Bot,
+  RefreshCw,
+  Clock,
+  CheckCircle2,
+  Zap,
+  TrendingUp,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
