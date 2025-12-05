@@ -1,11 +1,13 @@
 import { useMemo, useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { loadBoardData } from "@/services/asanaService";
+import { loadBoardData, fetchTaskStories } from "@/services/asanaService";
 import { EnhancedParsedTicket } from "@/utils/enhancedDataLoader";
 import {
   analyzeAgentActivity,
   calculateAgentSummary,
   analyzeAgentTrends,
+  mergeStoryDataIntoAgents,
+  isAITeammate,
 } from "@/utils/agentAnalytics";
 import { UseAgentAnalyticsReturn } from "@/types/agentAnalytics";
 
@@ -59,10 +61,38 @@ export function useAgentAnalytics(daysBack: number = 90): UseAgentAnalyticsRetur
     return [...tieWithBoard, ...sfdcWithBoard];
   }, [tieTickets, sfdcTickets]);
 
+  // Get task GIDs for AI teammate tickets (for story fetching)
+  const agentTaskGids = useMemo(() => {
+    return allTickets
+      .filter((t) => t.assignee && isAITeammate(t.assignee))
+      .map((t) => t.id)
+      .slice(0, 50); // Limit to avoid timeout
+  }, [allTickets]);
+
+  // Fetch stories for agent tickets
+  const {
+    data: storyData = [],
+    isLoading: storiesLoading,
+    refetch: refetchStories,
+  } = useQuery({
+    queryKey: ["agent-stories", agentTaskGids],
+    queryFn: () => fetchTaskStories(agentTaskGids),
+    enabled: agentTaskGids.length > 0,
+    staleTime: REFETCH_INTERVAL,
+    gcTime: REFETCH_INTERVAL,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
   // Analyze agent activity
   const agents = useMemo(() => {
-    return analyzeAgentActivity(allTickets);
-  }, [allTickets]);
+    const baseAgents = analyzeAgentActivity(allTickets);
+    // Merge in story data if available
+    if (storyData.length > 0) {
+      return mergeStoryDataIntoAgents(baseAgents, storyData);
+    }
+    return baseAgents;
+  }, [allTickets, storyData]);
 
   // Calculate summary
   const summary = useMemo(() => {
@@ -78,13 +108,13 @@ export function useAgentAnalytics(daysBack: number = 90): UseAgentAnalyticsRetur
   const refresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      await Promise.all([refetchTie(), refetchSfdc()]);
+      await Promise.all([refetchTie(), refetchSfdc(), refetchStories()]);
     } finally {
       setIsRefreshing(false);
     }
-  }, [refetchTie, refetchSfdc]);
+  }, [refetchTie, refetchSfdc, refetchStories]);
 
-  const loading = tieLoading || sfdcLoading || isRefreshing;
+  const loading = tieLoading || sfdcLoading || storiesLoading || isRefreshing;
   const error = tieError || sfdcError;
   const lastUpdated = Math.max(tieUpdatedAt || 0, sfdcUpdatedAt || 0);
 
