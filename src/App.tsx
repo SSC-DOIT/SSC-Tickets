@@ -8,14 +8,16 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Direct imports to avoid lazy loading issues
+import AITeammateDashboard from "./pages/AITeammateDashboard";
+import AgentProfilePage from "./pages/AgentProfilePage";
+
 // Lazy load page components for code splitting
 const MasterDashboard = lazy(() => import("./pages/MasterDashboard"));
 const TIEBoard = lazy(() => import("./pages/TIEBoard"));
 const SFDCBoard = lazy(() => import("./pages/SFDCBoard"));
 const DepartmentView = lazy(() => import("./pages/DepartmentView"));
 const BlockersView = lazy(() => import("./pages/BlockersView"));
-const AITeammateDashboard = lazy(() => import("./pages/AITeammateDashboard"));
-const AgentProfilePage = lazy(() => import("./pages/AgentProfilePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading fallback component
