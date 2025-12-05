@@ -5,6 +5,8 @@ import {
   CheckCircle2,
   Zap,
   TrendingUp,
+  MessageSquare,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -87,29 +89,39 @@ const AITeammateDashboard = () => {
 
       {/* Summary Metrics */}
       {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <MetricCard
-            title="Total Tickets Handled"
+            title="Total Tickets"
             value={summary.totalTicketsAssigned.toString()}
             icon={<CheckCircle2 className="w-5 h-5" />}
           />
           <MetricCard
-            title="Tickets Completed"
+            title="Completed"
             value={summary.totalTicketsCompleted.toString()}
             icon={<TrendingUp className="w-5 h-5" />}
             trend={summary.avgCompletionRate > 70 ? "up" : "neutral"}
           />
           <MetricCard
-            title="Total Time Saved"
+            title="Time Saved"
             value={`${summary.totalTimeSavedHours.toFixed(1)}h`}
             icon={<Zap className="w-5 h-5" />}
             trend="up"
           />
           <MetricCard
-            title="Avg Completion Rate"
+            title="Completion Rate"
             value={`${summary.avgCompletionRate.toFixed(0)}%`}
             icon={<Clock className="w-5 h-5" />}
             trend={summary.avgCompletionRate > 80 ? "up" : "neutral"}
+          />
+          <MetricCard
+            title="Comments Written"
+            value={summary.totalCommentsWritten.toString()}
+            icon={<MessageSquare className="w-5 h-5" />}
+          />
+          <MetricCard
+            title="Words Generated"
+            value={summary.totalWordsWritten.toLocaleString()}
+            icon={<FileText className="w-5 h-5" />}
           />
         </div>
       )}

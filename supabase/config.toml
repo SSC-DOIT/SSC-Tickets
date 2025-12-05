@@ -2,3 +2,6 @@ project_id = "dgwiheypnoeudspzkwsd"
 
 [functions.fetch-asana-tickets]
 verify_jwt = false
+
+[functions.fetch-task-stories]
+verify_jwt = false

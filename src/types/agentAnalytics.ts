@@ -23,6 +23,9 @@ export interface AgentActivityData {
   totalTimeSavedMinutes: number;
   automatedTickets: number;
   recentActivity: AgentActivityEvent[];
+  // Story-based metrics
+  commentsWritten: number;
+  wordsWritten: number;
 }
 
 // Individual activity event
@@ -64,6 +67,8 @@ export interface AgentSummary {
   avgCompletionRate: number;
   mostActiveAgent: string;
   fastestAgent: string;
+  totalCommentsWritten: number;
+  totalWordsWritten: number;
 }
 
 // Hook return type

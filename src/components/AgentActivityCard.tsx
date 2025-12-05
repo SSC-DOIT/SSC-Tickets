@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Bot, CheckCircle2, Clock, Zap } from "lucide-react";
+import { Bot, CheckCircle2, Clock, Zap, MessageSquare, FileText } from "lucide-react";
 import { AgentActivityData } from "@/types/agentAnalytics";
 import { cn } from "@/lib/utils";
 
@@ -68,6 +68,28 @@ export const AgentActivityCard = ({ agent, className }: AgentActivityCardProps) 
             <span className="text-xs">Open</span>
           </div>
           <p className="text-xl font-bold text-foreground">{agent.ticketsOpen}</p>
+        </div>
+      </div>
+
+      {/* Comments & Words */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <MessageSquare className="w-3 h-3" />
+            <span className="text-xs">Comments</span>
+          </div>
+          <p className="text-lg font-semibold text-foreground">
+            {agent.commentsWritten}
+          </p>
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <FileText className="w-3 h-3" />
+            <span className="text-xs">Words</span>
+          </div>
+          <p className="text-lg font-semibold text-foreground">
+            {agent.wordsWritten.toLocaleString()}
+          </p>
         </div>
       </div>
 

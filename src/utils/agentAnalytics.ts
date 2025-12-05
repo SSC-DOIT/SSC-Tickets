@@ -55,6 +55,8 @@ export const analyzeAgentActivity = (
       totalTimeSavedMinutes: 0,
       automatedTickets: 0,
       recentActivity: [],
+      commentsWritten: 0,
+      wordsWritten: 0,
     });
   });
 
@@ -181,6 +183,15 @@ export const calculateAgentSummary = (
         )
       : mostActive;
 
+  const totalCommentsWritten = agents.reduce(
+    (sum, a) => sum + a.commentsWritten,
+    0
+  );
+  const totalWordsWritten = agents.reduce(
+    (sum, a) => sum + a.wordsWritten,
+    0
+  );
+
   return {
     totalTicketsAssigned,
     totalTicketsCompleted,
@@ -188,6 +199,8 @@ export const calculateAgentSummary = (
     avgCompletionRate,
     mostActiveAgent: mostActive.name,
     fastestAgent: fastest.name,
+    totalCommentsWritten,
+    totalWordsWritten,
   };
 };
 
@@ -285,4 +298,31 @@ export const createAgentLeaderboard = (
       color: agent.color,
     };
   });
+};
+
+/**
+ * Merge story data into agent activity
+ */
+export const mergeStoryDataIntoAgents = (
+  agents: AgentActivityData[],
+  storyData: { taskGid: string; stories: { created_by: { name: string } | null; text: string }[] }[]
+): AgentActivityData[] => {
+  // Create a map for quick lookup
+  const agentMap = new Map(agents.map(a => [a.name, { ...a }]));
+
+  // Process each story
+  storyData.forEach(({ stories }) => {
+    stories.forEach((story) => {
+      const authorName = story.created_by?.name;
+      if (!authorName || !isAITeammate(authorName)) return;
+
+      const agent = agentMap.get(authorName);
+      if (!agent) return;
+
+      agent.commentsWritten++;
+      agent.wordsWritten += story.text?.split(/\s+/).filter(Boolean).length || 0;
+    });
+  });
+
+  return Array.from(agentMap.values());
 };

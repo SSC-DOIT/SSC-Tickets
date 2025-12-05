@@ -5,6 +5,24 @@ import { validateAsanaResponse, AsanaResponse } from "@/schemas/asanaSchemas";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
+// Story types
+export interface AsanaStory {
+  gid: string;
+  created_at: string;
+  created_by: {
+    gid: string;
+    name: string;
+  } | null;
+  resource_subtype: string;
+  text: string;
+  type: string;
+}
+
+export interface TaskStoriesResponse {
+  taskGid: string;
+  stories: AsanaStory[];
+}
+
 export class AsanaServiceError extends Error {
   constructor(
     message: string,
@@ -172,5 +190,43 @@ export function clearBoardCache(board?: "TIE" | "SFDC"): void {
     Object.keys(localStorage)
       .filter((key) => key.startsWith("asana-data-"))
       .forEach((key) => localStorage.removeItem(key));
+  }
+}
+
+/**
+ * Fetches stories (comments) for specified task GIDs
+ * @param taskGids - Array of Asana task GIDs
+ * @returns Array of task stories responses
+ */
+export async function fetchTaskStories(
+  taskGids: string[]
+): Promise<TaskStoriesResponse[]> {
+  if (taskGids.length === 0) return [];
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/functions/v1/fetch-task-stories`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ taskGids }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new AsanaServiceError(
+        `Failed to fetch stories: ${errorData.error || response.statusText}`,
+        response.status
+      );
+    }
+
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error("Error fetching task stories:", error);
+    return [];
   }
 }
