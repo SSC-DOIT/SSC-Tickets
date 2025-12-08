@@ -23,18 +23,17 @@ interface DateRange {
 }
 
 const PRESET_RANGES = [
-  { label: "Last 7 days", value: "7d", days: 7 },
-  { label: "Last 14 days", value: "14d", days: 14 },
-  { label: "Last 30 days", value: "30d", days: 30 },
-  { label: "Last 90 days", value: "90d", days: 90 },
+  { label: "30 days", value: "30d", days: 30 },
+  { label: "60 days", value: "60d", days: 60 },
+  { label: "90 days", value: "90d", days: 90 },
+  { label: "6 months", value: "6m", days: 180 },
+  { label: "12 months", value: "12m", days: 365 },
   { label: "Custom", value: "custom", days: 0 },
 ];
 
-function DateRangeSelector({ dateRange, onDateRangeChange }: { dateRange: DateRange; onDateRangeChange: (range: DateRange) => void }) {
-  const [selectedPreset, setSelectedPreset] = useState("90d");
-
+function DateRangeSelector({ dateRange, onDateRangeChange, selectedPreset, onPresetChange }: { dateRange: DateRange; onDateRangeChange: (range: DateRange) => void; selectedPreset: string; onPresetChange: (value: string) => void }) {
   const handlePresetChange = (value: string) => {
-    setSelectedPreset(value);
+    onPresetChange(value);
     const preset = PRESET_RANGES.find((p) => p.value === value);
     if (preset && preset.days > 0) {
       onDateRangeChange({
@@ -46,7 +45,7 @@ function DateRangeSelector({ dateRange, onDateRangeChange }: { dateRange: DateRa
 
   const handleCalendarSelect = (range: { from?: Date; to?: Date } | undefined) => {
     if (range?.from && range?.to) {
-      setSelectedPreset("custom");
+      onPresetChange("custom");
       onDateRangeChange({ from: startOfDay(range.from), to: endOfDay(range.to) });
     }
   };
@@ -105,6 +104,7 @@ function calculateFilteredSummary(agents: AgentActivityData[]): AgentSummary | n
   const fastest = agentsWithCompletions.length > 0 ? agentsWithCompletions.reduce((prev, curr) => (curr.avgCompletionDays < prev.avgCompletionDays ? curr : prev)) : mostActive;
   const totalCommentsWritten = agents.reduce((sum, a) => sum + a.commentsWritten, 0);
   const totalWordsWritten = agents.reduce((sum, a) => sum + a.wordsWritten, 0);
+  const totalFieldsUpdated = agents.reduce((sum, a) => sum + (a.fieldsUpdated || 0), 0);
   const totalSubtasksCreated = agents.reduce((sum, a) => sum + (a.subtasksCreated || 0), 0);
   const totalSubtasksCompleted = agents.reduce((sum, a) => sum + (a.subtasksCompleted || 0), 0);
   const allProjects = new Set(agents.flatMap(a => a.projectsImpacted || []));
@@ -118,6 +118,7 @@ function calculateFilteredSummary(agents: AgentActivityData[]): AgentSummary | n
     fastestAgent: fastest.name,
     totalCommentsWritten,
     totalWordsWritten,
+    totalFieldsUpdated,
     totalSubtasksCreated,
     totalSubtasksCompleted,
     totalProjectsImpacted: allProjects.size,
@@ -125,12 +126,16 @@ function calculateFilteredSummary(agents: AgentActivityData[]): AgentSummary | n
 }
 
 export default function AIAgentsDashboard() {
+  const [selectedPreset, setSelectedPreset] = useState("90d");
   const [dateRange, setDateRange] = useState<DateRange>({
     from: startOfDay(subDays(new Date(), 90)),
     to: endOfDay(new Date()),
   });
 
-  const { agents, summary, trends, loading, lastUpdated, refresh } = useAITeammateAnalytics(90);
+  // Calculate days from date range for the hook
+  const daysBack = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
+
+  const { agents, summary, trends, loading, lastUpdated, refresh } = useAITeammateAnalytics(daysBack);
   const filteredAgents = useMemo(() => filterAgentsByDateRange(agents, dateRange), [agents, dateRange]);
   const filteredSummary = useMemo(() => (agents.length > 0 ? calculateFilteredSummary(filteredAgents) : summary), [filteredAgents, summary, agents.length]);
 
@@ -168,7 +173,7 @@ export default function AIAgentsDashboard() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-4">
-          <DateRangeSelector dateRange={dateRange} onDateRangeChange={setDateRange} />
+          <DateRangeSelector dateRange={dateRange} onDateRangeChange={setDateRange} selectedPreset={selectedPreset} onPresetChange={setSelectedPreset} />
           <span className="text-sm text-muted-foreground">Updated: {formatLastUpdated()}</span>
           <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
             <RefreshCw className={cn("w-4 h-4 mr-2", loading && "animate-spin")} />

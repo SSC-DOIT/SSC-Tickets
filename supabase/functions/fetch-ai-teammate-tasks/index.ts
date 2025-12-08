@@ -44,6 +44,7 @@ interface AgentTasksResult {
   stories: AsanaStory[];
   subtasksCreated: number;
   subtasksCompleted: number;
+  fieldsUpdated: number;
   projectsImpacted: string[];
 }
 
@@ -143,6 +144,7 @@ serve(async (req) => {
         let allStories: AsanaStory[] = [];
         let subtasksCreated = 0;
         let subtasksCompleted = 0;
+        let fieldsUpdated = 0;
 
         if (includeStories && allTasks.length > 0) {
           // Limit story fetching to most recent 20 tasks to avoid timeout
@@ -164,7 +166,6 @@ serve(async (req) => {
                 );
                 allStories = [...allStories, ...agentStories];
 
-                // Count subtask events
                 for (const story of storiesData.data || []) {
                   if (story.created_by?.gid === agentGid) {
                     if (story.resource_subtype === 'added_to_task') {
@@ -172,6 +173,14 @@ serve(async (req) => {
                     }
                     if (story.resource_subtype === 'marked_complete' && task.parent) {
                       subtasksCompleted++;
+                    }
+                    // Count field changes (enum_value_changed, custom_field_value_changed, etc.)
+                    if (story.resource_subtype?.includes('field') || 
+                        story.resource_subtype === 'enum_value_changed' ||
+                        story.resource_subtype === 'name_changed' ||
+                        story.resource_subtype === 'notes_changed' ||
+                        story.resource_subtype === 'due_date_changed') {
+                      fieldsUpdated++;
                     }
                   }
                 }
@@ -210,6 +219,7 @@ serve(async (req) => {
           stories: allStories,
           subtasksCreated,
           subtasksCompleted,
+          fieldsUpdated,
           projectsImpacted,
         });
 
@@ -222,6 +232,7 @@ serve(async (req) => {
           stories: [],
           subtasksCreated: 0,
           subtasksCompleted: 0,
+          fieldsUpdated: 0,
           projectsImpacted: [],
         });
       }

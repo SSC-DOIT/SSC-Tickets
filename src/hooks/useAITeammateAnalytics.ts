@@ -65,6 +65,7 @@ export function useAITeammateAnalytics(daysBack: number = 90): UseAgentAnalytics
         automatedTickets: 0,
         commentsWritten: 0,
         wordsWritten: 0,
+        fieldsUpdated: 0,
         subtasksCreated: 0,
         subtasksCompleted: 0,
         projectsImpacted: [],
@@ -85,6 +86,7 @@ export function useAITeammateAnalytics(daysBack: number = 90): UseAgentAnalytics
     const totalTimeSavedMinutes = agents.reduce((sum, a) => sum + a.totalTimeSavedMinutes, 0);
     const totalCommentsWritten = agents.reduce((sum, a) => sum + a.commentsWritten, 0);
     const totalWordsWritten = agents.reduce((sum, a) => sum + a.wordsWritten, 0);
+    const totalFieldsUpdated = agents.reduce((sum, a) => sum + (a.fieldsUpdated || 0), 0);
     const totalSubtasksCreated = agents.reduce((sum, a) => sum + a.subtasksCreated, 0);
     const totalSubtasksCompleted = agents.reduce((sum, a) => sum + a.subtasksCompleted, 0);
 
@@ -115,6 +117,7 @@ export function useAITeammateAnalytics(daysBack: number = 90): UseAgentAnalytics
       fastestAgent: fastest.name,
       totalCommentsWritten,
       totalWordsWritten,
+      totalFieldsUpdated,
       totalSubtasksCreated,
       totalSubtasksCompleted,
       totalProjectsImpacted: allProjects.size,
