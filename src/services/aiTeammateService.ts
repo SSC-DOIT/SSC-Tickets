@@ -6,8 +6,8 @@ import {
   AI_TEAMMATES 
 } from "@/types/agentAnalytics";
 
-// Your Asana workspace GID - extracted from project URLs
-const WORKSPACE_GID = "1178935369889839";
+// Asana workspace GID
+const WORKSPACE_GID = "169426931772429";
 
 export interface FetchAITeammateTasksOptions {
   agentNames?: string[];
@@ -70,6 +70,7 @@ export function transformToAgentActivityData(results: AgentTasksResult[]): Agent
         automatedTickets: 0,
         commentsWritten: 0,
         wordsWritten: 0,
+        fieldsUpdated: result?.fieldsUpdated || 0,
         subtasksCreated: result?.subtasksCreated || 0,
         subtasksCompleted: result?.subtasksCompleted || 0,
         projectsImpacted: result?.projectsImpacted || [],
@@ -78,7 +79,7 @@ export function transformToAgentActivityData(results: AgentTasksResult[]): Agent
       };
     }
 
-    const { tasks, stories, subtasksCreated, subtasksCompleted, projectsImpacted } = result;
+    const { tasks, stories, subtasksCreated, subtasksCompleted, fieldsUpdated, projectsImpacted } = result;
     
     // Count tasks
     const ticketsAssigned = tasks.length;
@@ -165,6 +166,7 @@ export function transformToAgentActivityData(results: AgentTasksResult[]): Agent
       automatedTickets: ticketsCompleted,
       commentsWritten,
       wordsWritten,
+      fieldsUpdated: fieldsUpdated || 0,
       subtasksCreated,
       subtasksCompleted,
       projectsImpacted,

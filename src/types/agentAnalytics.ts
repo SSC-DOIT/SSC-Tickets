@@ -29,6 +29,7 @@ export interface AgentActivityData {
   // Story-based metrics
   commentsWritten: number;
   wordsWritten: number;
+  fieldsUpdated: number;
   // Subtask metrics
   subtasksCreated: number;
   subtasksCompleted: number;
@@ -81,6 +82,7 @@ export interface AgentSummary {
   fastestAgent: string;
   totalCommentsWritten: number;
   totalWordsWritten: number;
+  totalFieldsUpdated: number;
   totalSubtasksCreated: number;
   totalSubtasksCompleted: number;
   totalProjectsImpacted: number;
@@ -94,6 +96,7 @@ export interface AgentTasksResult {
   stories: AsanaStory[];
   subtasksCreated: number;
   subtasksCompleted: number;
+  fieldsUpdated: number;
   projectsImpacted: string[];
 }
 

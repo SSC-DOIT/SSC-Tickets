@@ -58,6 +58,7 @@ export const analyzeAgentActivity = (
       recentActivity: [],
       commentsWritten: 0,
       wordsWritten: 0,
+      fieldsUpdated: 0,
       subtasksCreated: 0,
       subtasksCompleted: 0,
       projectsImpacted: [],
@@ -206,9 +207,10 @@ export const calculateAgentSummary = (
     fastestAgent: fastest.name,
     totalCommentsWritten,
     totalWordsWritten,
-    totalSubtasksCreated: 0,
-    totalSubtasksCompleted: 0,
-    totalProjectsImpacted: 0,
+    totalFieldsUpdated: agents.reduce((sum, a) => sum + (a.fieldsUpdated || 0), 0),
+    totalSubtasksCreated: agents.reduce((sum, a) => sum + (a.subtasksCreated || 0), 0),
+    totalSubtasksCompleted: agents.reduce((sum, a) => sum + (a.subtasksCompleted || 0), 0),
+    totalProjectsImpacted: new Set(agents.flatMap(a => a.projectsImpacted || [])).size,
   };
 };
 
