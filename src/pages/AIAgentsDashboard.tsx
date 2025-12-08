@@ -8,7 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useAgentAnalytics } from "@/hooks/useAgentAnalytics";
+import { useAITeammateAnalytics } from "@/hooks/useAITeammateAnalytics";
 import { AgentActivityCard } from "@/components/AgentActivityCard";
 import { AgentComparisonChart } from "@/components/AgentComparisonChart";
 import { AgentActivityTimeline } from "@/components/AgentActivityTimeline";
@@ -105,6 +105,9 @@ function calculateFilteredSummary(agents: AgentActivityData[]): AgentSummary | n
   const fastest = agentsWithCompletions.length > 0 ? agentsWithCompletions.reduce((prev, curr) => (curr.avgCompletionDays < prev.avgCompletionDays ? curr : prev)) : mostActive;
   const totalCommentsWritten = agents.reduce((sum, a) => sum + a.commentsWritten, 0);
   const totalWordsWritten = agents.reduce((sum, a) => sum + a.wordsWritten, 0);
+  const totalSubtasksCreated = agents.reduce((sum, a) => sum + (a.subtasksCreated || 0), 0);
+  const totalSubtasksCompleted = agents.reduce((sum, a) => sum + (a.subtasksCompleted || 0), 0);
+  const allProjects = new Set(agents.flatMap(a => a.projectsImpacted || []));
 
   return {
     totalTicketsAssigned,
@@ -115,6 +118,9 @@ function calculateFilteredSummary(agents: AgentActivityData[]): AgentSummary | n
     fastestAgent: fastest.name,
     totalCommentsWritten,
     totalWordsWritten,
+    totalSubtasksCreated,
+    totalSubtasksCompleted,
+    totalProjectsImpacted: allProjects.size,
   };
 }
 
@@ -124,7 +130,7 @@ export default function AIAgentsDashboard() {
     to: endOfDay(new Date()),
   });
 
-  const { agents, summary, trends, loading, lastUpdated, refresh } = useAgentAnalytics(90);
+  const { agents, summary, trends, loading, lastUpdated, refresh } = useAITeammateAnalytics(90);
   const filteredAgents = useMemo(() => filterAgentsByDateRange(agents, dateRange), [agents, dateRange]);
   const filteredSummary = useMemo(() => (agents.length > 0 ? calculateFilteredSummary(filteredAgents) : summary), [filteredAgents, summary, agents.length]);
 
