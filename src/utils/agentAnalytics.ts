@@ -46,6 +46,7 @@ export const analyzeAgentActivity = (
       name: agent.name,
       role: agent.role,
       color: agent.color,
+      gid: agent.gid,
       ticketsAssigned: 0,
       ticketsCompleted: 0,
       ticketsOpen: 0,
@@ -57,6 +58,10 @@ export const analyzeAgentActivity = (
       recentActivity: [],
       commentsWritten: 0,
       wordsWritten: 0,
+      subtasksCreated: 0,
+      subtasksCompleted: 0,
+      projectsImpacted: [],
+      portfoliosImpacted: [],
     });
   });
 
@@ -201,6 +206,9 @@ export const calculateAgentSummary = (
     fastestAgent: fastest.name,
     totalCommentsWritten,
     totalWordsWritten,
+    totalSubtasksCreated: 0,
+    totalSubtasksCompleted: 0,
+    totalProjectsImpacted: 0,
   };
 };
 

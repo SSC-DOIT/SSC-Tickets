@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.fetch-task-stories]
 verify_jwt = false
+
+[functions.fetch-ai-teammate-tasks]
+verify_jwt = false
