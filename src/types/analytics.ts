@@ -30,6 +30,7 @@ export interface RecentTicket {
 export interface EnhancedAnalyticsData {
   netNewTrends: NetNewTicketPoint[];
   responseTrends: ResponseTrendPoint[];
+  dualResponseTrends: DualResponseTrendPoint[];
   automationAnalytics: AutomationAnalytics;
   openTrends: OpenTicketTrendPoint[];
   categories: CategoryData[];
@@ -55,6 +56,16 @@ export interface ResponseTrendPoint {
   date: string;
   avgResponseHours: number;
   count: number;
+}
+
+// Dual response time trend data point (AI vs Human)
+export interface DualResponseTrendPoint {
+  date: string;
+  week: string;
+  avgAIResponseMinutes: number | null;
+  avgHumanResponseMinutes: number | null;
+  aiTicketCount: number;
+  humanTicketCount: number;
 }
 
 // Automation savings by stage (per-ticket basis)

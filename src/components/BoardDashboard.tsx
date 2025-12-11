@@ -172,7 +172,7 @@ export const BoardDashboard = ({ board, boardName }: BoardDashboardProps) => {
                 <OpenTicketTrendChart data={enhancedData.openTrends} />
                 <NetNewTicketChart data={enhancedData.netNewTrends} />
                 <FirstResponseTrendChart
-                  data={enhancedData.responseTrends}
+                  data={enhancedData.dualResponseTrends}
                   rolloutDate="Oct 21"
                 />
               </>

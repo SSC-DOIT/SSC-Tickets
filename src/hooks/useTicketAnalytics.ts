@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { loadBoardData } from "@/services/asanaService";
 import { EnhancedParsedTicket } from "@/utils/enhancedDataLoader";
@@ -17,6 +17,10 @@ import {
   EnhancedAnalyticsData,
   UseTicketAnalyticsReturn,
 } from "@/types/analytics";
+import {
+  fetchFirstResponseData,
+  calculateDualResponseTrends,
+} from "@/services/responseTimeService";
 
 const ROLLOUT_DATE = new Date("2025-10-21");
 const REFETCH_INTERVAL = 5 * 60 * 1000; // 5 minutes
@@ -60,6 +64,32 @@ export function useTicketAnalytics(
     return analyzeResponseTimes(tickets, ROLLOUT_DATE, lastThursday, julyFirst);
   }, [tickets]);
 
+  // Get recent ticket GIDs for story fetching (last 90 days)
+  const recentTicketData = useMemo(() => {
+    if (tickets.length === 0) return { gids: [], createdAtMap: new Map<string, string>() };
+    
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    
+    const recentTickets = tickets.filter(
+      (t) => new Date(t.createdAt) >= ninetyDaysAgo
+    );
+    
+    const gids = recentTickets.map((t) => t.id);
+    const createdAtMap = new Map(recentTickets.map((t) => [t.id, t.createdAt]));
+    
+    return { gids, createdAtMap };
+  }, [tickets]);
+
+  // Fetch first response data (stories) for recent tickets
+  const { data: responseData } = useQuery({
+    queryKey: ["responseData", board, recentTicketData.gids.length],
+    queryFn: () => fetchFirstResponseData(recentTicketData.gids, recentTicketData.createdAtMap),
+    enabled: recentTicketData.gids.length > 0,
+    staleTime: REFETCH_INTERVAL,
+    gcTime: REFETCH_INTERVAL,
+  });
+
   // Memoize enhanced analytics
   const enhancedData = useMemo<EnhancedAnalyticsData | null>(() => {
     if (tickets.length === 0) return null;
@@ -67,6 +97,11 @@ export function useTicketAnalytics(
     const netNewTrends = analyzeNetNewTickets(tickets, daysBack);
     const responseTrends = analyzeFirstResponseTrends(tickets, daysBack);
     const openTrends = analyzeOpenTicketTrends(tickets, daysBack);
+
+    // Calculate dual response trends from story data
+    const dualResponseTrends = responseData
+      ? calculateDualResponseTrends(responseData, daysBack)
+      : [];
 
     // Comprehensive automation analytics (per-ticket savings and forecasting)
     const automationAnalytics = analyzeAutomationAnalytics(tickets);
@@ -77,11 +112,12 @@ export function useTicketAnalytics(
     return {
       netNewTrends,
       responseTrends,
+      dualResponseTrends,
       automationAnalytics,
       openTrends,
       categories,
     };
-  }, [tickets, daysBack]);
+  }, [tickets, daysBack, responseData]);
 
   // Manual refresh with loading state
   const refresh = useCallback(async () => {

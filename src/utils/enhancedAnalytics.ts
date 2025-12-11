@@ -21,6 +21,15 @@ export interface FirstResponseTrendData {
   count: number;
 }
 
+export interface DualResponseTrendData {
+  date: string;
+  week: string;
+  avgAIResponseMinutes: number | null;
+  avgHumanResponseMinutes: number | null;
+  aiTicketCount: number;
+  humanTicketCount: number;
+}
+
 export interface OpenTicketTrendData {
   date: string;
   openCount: number;

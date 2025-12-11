@@ -44,6 +44,11 @@ export interface EnhancedParsedTicket extends ParsedTicket {
     Department?: string;
     Section?: string;
   };
+  // Dual response time fields (populated from story data)
+  firstAIResponseAt?: string | null;
+  firstAIResponseMinutes?: number | null;
+  firstHumanResponseAt?: string | null;
+  firstHumanResponseMinutes?: number | null;
 }
 
 const calculateResponseTime = (createdAt: string, modifiedAt?: string): number | null => {
